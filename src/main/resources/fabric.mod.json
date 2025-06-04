@@ -3,12 +3,12 @@
   "id": "fast_happy_ghasts",
   "version": "1.0.0",
   "name": "Fast Happy Ghasts",
-  "description": "Make Happy Ghasts move faster when riding forward",
+  "description": "This mod makes the happy ghasts go faster when pressing forward!",
   "authors": [
-    "YourName"
+    "MALEgolf100/iamliterallybasil"
   ],
   "contact": {},
-  "license": "MIT",
+  "license": "",
   "environment": "*",
   "entrypoints": {
     "client": [
