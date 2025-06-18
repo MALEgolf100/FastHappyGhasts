@@ -29,15 +29,15 @@ public class FastHappyGhastsClient implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null || client.world == null) {
-                System.out.println("[FastHappyGhasts] No player or world loaded.");
+                log("[FastHappyGhasts] No player or world loaded.");
                 return;
             }
             if (!config.get("enabled").getAsBoolean()) {
-                System.out.println("[FastHappyGhasts] Mod disabled in config.");
+                log("[FastHappyGhasts] Mod disabled in config.");
                 return;
             }
             if (!config.get("allowOnServers").getAsBoolean() && client.getCurrentServerEntry() != null) {
-                System.out.println("[FastHappyGhasts] Disallowed on servers and player is on a server.");
+                log("[FastHappyGhasts] Disallowed on servers and player is on a server.");
                 return;
             }
 
@@ -45,19 +45,17 @@ public class FastHappyGhastsClient implements ClientModInitializer {
             Entity vehicle = player.getVehicle();
 
             if (vehicle == null) {
-                // Player not riding anything
                 return;
             }
 
             Identifier entityId = Registries.ENTITY_TYPE.getId(vehicle.getType());
             if (entityId == null) {
-                System.out.println("[FastHappyGhasts] Vehicle entity ID is null.");
+                log("[FastHappyGhasts] Vehicle entity ID is null.");
                 return;
             }
 
-            System.out.println("[FastHappyGhasts] Riding entity: " + entityId);
+            log("[FastHappyGhasts] Riding entity: " + entityId);
 
-            // FIXED: Check against "minecraft" namespace, not mod ID
             if (entityId.getNamespace().equals("minecraft") && entityId.getPath().equals("happy_ghast")) {
                 if (client.options.forwardKey.isPressed()) {
                     double speedMultiplier = config.get("speedMultiplier").getAsDouble();
@@ -66,14 +64,14 @@ public class FastHappyGhastsClient implements ClientModInitializer {
                     Vec3d newVelocity = lookVec.multiply(speedMultiplier);
 
                     vehicle.setVelocity(newVelocity);
-                    vehicle.velocityModified = true; // ensure velocity update
+                    vehicle.velocityModified = true;
 
-                    System.out.println("[FastHappyGhasts] Applied velocity " + newVelocity + " to happy_ghast.");
+                    log("[FastHappyGhasts] Applied velocity " + newVelocity + " to happy_ghast.");
                 } else {
-                    System.out.println("[FastHappyGhasts] Forward key not pressed.");
+                    log("[FastHappyGhasts] Forward key not pressed.");
                 }
             } else {
-                System.out.println("[FastHappyGhasts] Vehicle is not happy_ghast. It is " + entityId);
+                log("[FastHappyGhasts] Vehicle is not happy_ghast. It is " + entityId);
             }
         });
     }
@@ -83,14 +81,14 @@ public class FastHappyGhastsClient implements ClientModInitializer {
             try {
                 String content = new String(Files.readAllBytes(CONFIG_PATH));
                 config = GSON.fromJson(content, JsonObject.class);
-                System.out.println("[FastHappyGhasts] Config loaded: " + config);
+                log("[FastHappyGhasts] Config loaded: " + config);
             } catch (IOException e) {
-                e.printStackTrace();
-                System.out.println("[FastHappyGhasts] Failed to load config, creating default.");
+                if (isLoggingEnabled()) e.printStackTrace();
+                log("[FastHappyGhasts] Failed to load config, creating default.");
                 createDefaultConfig();
             }
         } else {
-            System.out.println("[FastHappyGhasts] Config not found, creating default.");
+            log("[FastHappyGhasts] Config not found, creating default.");
             createDefaultConfig();
         }
     }
@@ -100,6 +98,7 @@ public class FastHappyGhastsClient implements ClientModInitializer {
         config.addProperty("enabled", true);
         config.addProperty("allowOnServers", false);
         config.addProperty("speedMultiplier", 1.5);
+        config.addProperty("enableLogging", false);  // NEW config key
 
         saveConfig();
     }
@@ -108,9 +107,19 @@ public class FastHappyGhastsClient implements ClientModInitializer {
         try {
             Files.createDirectories(CONFIG_PATH.getParent());
             Files.write(CONFIG_PATH, GSON.toJson(config).getBytes());
-            System.out.println("[FastHappyGhasts] Config saved.");
+            log("[FastHappyGhasts] Config saved.");
         } catch (IOException e) {
-            e.printStackTrace();
+            if (isLoggingEnabled()) e.printStackTrace();
         }
+    }
+
+    private void log(String message) {
+        if (isLoggingEnabled()) {
+            System.out.println(message);
+        }
+    }
+
+    private boolean isLoggingEnabled() {
+        return config != null && config.has("enableLogging") && config.get("enableLogging").getAsBoolean();
     }
 }
