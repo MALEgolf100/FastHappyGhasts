@@ -103,7 +103,7 @@ public class FastHappyGhastsClient implements ClientModInitializer {
         saveConfig();
     }
 
-    private void saveConfig() {
+    public static void saveConfig() {
         try {
             Files.createDirectories(CONFIG_PATH.getParent());
             Files.write(CONFIG_PATH, GSON.toJson(config).getBytes());
@@ -113,13 +113,13 @@ public class FastHappyGhastsClient implements ClientModInitializer {
         }
     }
 
-    private void log(String message) {
+    private static void log(String message) {
         if (isLoggingEnabled()) {
             System.out.println(message);
         }
     }
 
-    private boolean isLoggingEnabled() {
+    private static boolean isLoggingEnabled() {
         return config != null && config.has("enableLogging") && config.get("enableLogging").getAsBoolean();
     }
 }
