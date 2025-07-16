@@ -23,8 +23,11 @@ public abstract class HappyGhastEntityMixin {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("HappyGhastFlight");
 
-    @Inject(method = {"addPassenger*"}, at = {@At("TAIL")})
-    private void onAddPassenger(Entity entity, CallbackInfo ci) {
+    @Inject(
+            method = "addPassenger(Lnet/minecraft/entity/player/PlayerEntity;)V",
+            at = @At("TAIL")
+    )
+    private void onAddPassenger(PlayerEntity entity, CallbackInfo ci) {
         ModConfig config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
         if(!config.isEnabled())
             return;
