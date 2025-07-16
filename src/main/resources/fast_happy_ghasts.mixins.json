@@ -4,6 +4,7 @@
   "package": "com.fasthappyghasts.fast_happy_ghasts.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "HappyGhastEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
