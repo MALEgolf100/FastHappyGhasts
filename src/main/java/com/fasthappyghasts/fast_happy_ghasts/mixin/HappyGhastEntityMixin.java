@@ -31,11 +31,9 @@ public abstract class HappyGhastEntityMixin {
         ModConfig config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
         if(!config.isEnabled())
             return;
-        if (entity instanceof PlayerEntity) {
+        if (entity instanceof PlayerEntity && getControllingPassenger() == entity) {
             HappyGhastEntity ghast = (HappyGhastEntity)(Object) this;
-            if (getControllingPassenger() == entity) {
-                HappyGhastSpeedModifier.add(ghast, config.getSpeedMultiplier());
-            }
+            HappyGhastSpeedModifier.add(ghast, config.getSpeedMultiplier());
         }
     }
 
@@ -46,7 +44,10 @@ public abstract class HappyGhastEntityMixin {
             return;
         if (!(entity instanceof PlayerEntity))
             return;
-        HappyGhastEntity ghast = (HappyGhastEntity)(Object) this;
-        HappyGhastSpeedModifier.remove(ghast);
+        // If the happy ghast is not being ridden, remove the speed modifier
+        if (getControllingPassenger() == null) {
+            HappyGhastEntity ghast = (HappyGhastEntity) (Object) this;
+            HappyGhastSpeedModifier.remove(ghast);
+        }
     }
 }
