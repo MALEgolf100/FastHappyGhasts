@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "fast_happy_ghasts",
-  "version": "1.0.0",
+  "version": "1.4",
   "name": "Fast Happy Ghasts",
   "description": "This mod makes the happy ghasts go faster when pressing forward!",
   "authors": [
@@ -11,20 +11,21 @@
   "license": "",
   "environment": "*",
   "entrypoints": {
-    "client": [
-      "com.fasthappyghasts.fast_happy_ghasts.client.FastHappyGhastsClient"
-    ],
-    "modmenu": [
-      "com.fasthappyghasts.fast_happy_ghasts.client.compatability.ModMenuCompat"
+    "server": [
+      "com.fasthappyghasts.fast_happy_ghasts.FastHappyGhasts"
     ]
   },
+  "mixins": [
+    {
+      "config": "fast_happy_ghasts.mixins.json",
+      "environment": "server"
+    }
+  ],
   "depends": {
     "fabricloader": ">=0.14.19",
     "fabric": "*",
     "minecraft": "1.21.x",
     "cloth-config": ">=11.0.0"
   },
-  "suggests": {
-    "modmenu": "*"
-  }
+  "suggests": {}
 }
