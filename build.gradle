@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.11-SNAPSHOT'
+    id "net.fabricmc.fabric-loom" version '1.15-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -41,16 +41,15 @@ repositories {
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
     // Cloth Config for Fabric
-    modImplementation "me.shedaniel.cloth:cloth-config-fabric:20.0.148"
+    implementation "me.shedaniel.cloth:cloth-config-fabric:26.1.154"
 
-    // ModMenu for config GUI integration — note the correct group and artifact IDs!
-    modImplementation "com.terraformersmc:modmenu:16.0.0-rc.1"
+    // ModMenu 18.x is built for MC 26.1
+    implementation "com.terraformersmc:modmenu:18.0.0-alpha.8"
 }
 
 processResources {
@@ -66,7 +65,7 @@ processResources {
     }
 }
 
-def targetJavaVersion = 21
+def targetJavaVersion = 25
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {

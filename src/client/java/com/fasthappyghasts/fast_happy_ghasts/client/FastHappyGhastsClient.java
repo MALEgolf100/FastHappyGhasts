@@ -4,12 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.phys.Vec3;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +27,7 @@ public class FastHappyGhastsClient implements ClientModInitializer {
         loadConfig();
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (client.player == null || client.world == null) {
+            if (client.player == null || client.level == null) {
                 log("[FastHappyGhasts] No player or world loaded.");
                 return;
             }
@@ -36,19 +35,19 @@ public class FastHappyGhastsClient implements ClientModInitializer {
                 log("[FastHappyGhasts] Mod disabled in config.");
                 return;
             }
-            if (!config.get("allowOnServers").getAsBoolean() && client.getCurrentServerEntry() != null) {
+            if (!config.get("allowOnServers").getAsBoolean() && client.getCurrentServer() != null) {
                 log("[FastHappyGhasts] Disallowed on servers and player is on a server.");
                 return;
             }
 
-            PlayerEntity player = client.player;
+            Player player = client.player;
             Entity vehicle = player.getVehicle();
 
             if (vehicle == null) {
                 return;
             }
 
-            Identifier entityId = Registries.ENTITY_TYPE.getId(vehicle.getType());
+            net.minecraft.resources.@org.jspecify.annotations.NonNull Identifier entityId = BuiltInRegistries.ENTITY_TYPE.getKey(vehicle.getType());
             if (entityId == null) {
                 log("[FastHappyGhasts] Vehicle entity ID is null.");
                 return;
@@ -57,14 +56,14 @@ public class FastHappyGhastsClient implements ClientModInitializer {
             log("[FastHappyGhasts] Riding entity: " + entityId);
 
             if (entityId.getNamespace().equals("minecraft") && entityId.getPath().equals("happy_ghast")) {
-                if (client.options.forwardKey.isPressed()) {
+                if (client.options.keyUp.isDown()) {
                     double speedMultiplier = config.get("speedMultiplier").getAsDouble();
 
-                    Vec3d lookVec = player.getRotationVector().normalize();
-                    Vec3d newVelocity = lookVec.multiply(speedMultiplier);
+                    Vec3 lookVec = player.getLookAngle().normalize();
+                    Vec3 newVelocity = lookVec.scale(speedMultiplier);
 
-                    vehicle.setVelocity(newVelocity);
-                    vehicle.velocityModified = true;
+                    vehicle.setDeltaMovement(newVelocity);
+                    vehicle.hurtMarked = true;
 
                     log("[FastHappyGhasts] Applied velocity " + newVelocity + " to happy_ghast.");
                 } else {
@@ -98,7 +97,7 @@ public class FastHappyGhastsClient implements ClientModInitializer {
         config.addProperty("enabled", true);
         config.addProperty("allowOnServers", false);
         config.addProperty("speedMultiplier", 1.5);
-        config.addProperty("enableLogging", false);  // NEW config key
+        config.addProperty("enableLogging", false);
 
         saveConfig();
     }
